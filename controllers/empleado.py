@@ -3,23 +3,35 @@ from utils.mongodb import get_collection
 from fastapi import HTTPException
 from bson import ObjectId
 
+from pipelines.empleado_pipeline import validate_user_pipeline
+
 from models.empleado import Empleado
 
 coll = get_collection("empleados")
 
-async def create_empleado(empleado: Empleado) -> Empleado:
+async def create_empleado(empleado: Empleado) -> dict:
     try:
-        #Verificar que direcciona a un usuario real
-        coll_users = get_collection("users")
-
-        existing_user = coll_users.find_one({"_id": ObjectId(empleado.id_usuario)})
-        
-        if not existing_user:
-            raise HTTPException(status_code=404, detail="Usuario no encontrado, no podemos registrar el empleado")
+        print("Esto se ejecuta")
         #Verificacion de que ningun otro empleado tenga al referencia al usuario
         existing_empleado = coll.find_one({"id_usuario":empleado.id_usuario})
         if existing_empleado:
             raise HTTPException(status_code=400, detail="El usuario ya esta asociado a otro empleado")
+        
+        coll_users = get_collection("users")
+        
+        #Validar que existe el usuario y que este activo
+         
+        user_validate_pipeline = validate_user_pipeline(empleado.id_usuario)
+        existing_user = list(coll_users.aggregate(user_validate_pipeline))
+        
+        
+        if not existing_user:
+            raise HTTPException(status_code=404, detail="El usuario de referencia no existe o no esta activo ")
+
+        # existing_user = coll_users.find_one({"_id": ObjectId(empleado.id_usuario)})
+        
+        # if not existing_user:
+        #     raise HTTPException(status_code=404, detail="Usuario no encontrado, no podemos registrar el empleado")
         
         #Verificar que existe el tipo de emppleado
         coll_tipos_empleados = get_collection("tipos_empleado")
@@ -30,8 +42,15 @@ async def create_empleado(empleado: Empleado) -> Empleado:
         empleado_dict = empleado.model_dump(exclude={"id"})
         inserted = coll.insert_one(empleado_dict)
         empleado.id = str(inserted.inserted_id)
-        print(empleado)
-        return empleado
+        
+        for user in existing_user:
+            user.pop('_id', None)  # elimina el campo si existe
+        
+        return {
+            "message" : "Empleado creado correctamente",
+            "info_empleado" : empleado,
+            "info_user" : existing_user
+        }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     

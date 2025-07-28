@@ -5,8 +5,8 @@ from utils.security import validateadmin
 
 router = APIRouter()
 
-@router.post("/empleados", response_model=Empleado, tags=["Empleados"])
-async def create_empleado_endpoint(request:Request, empleado:Empleado) -> Empleado:
+@router.post("/empleados", response_model=dict, tags=["Empleados"])
+async def create_empleado_endpoint(request:Request, empleado:Empleado) -> dict:
     return await create_empleado(empleado)
 
 @router.delete("/empleados/{empleado_id}", response_model=Empleado, tags=["Empleados"])
