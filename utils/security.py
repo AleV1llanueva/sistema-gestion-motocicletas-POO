@@ -43,22 +43,23 @@ def create_jwt_token(
     return token
 
 def validateuser(func):
-    @wraps(func)
-    async def wrapper( *args, **kwargs ):
-        request = kwargs.get('request')
+    @wraps(func) # Permite que la función decorada mantenga su nombre y docstring
+    async def wrapper( *args, **kwargs ): #ayudan a recibir los parametros de invocacion y para acceder a los argumentos de la funcion
+        request = kwargs.get('request') # Obtiene el objeto request de los argumentos
+         # Si no se encuentra el objeto request, lanza una excepcion HTTP 400
         if not request:
-            raise HTTPException( status_code=400, detail="Request object not found"  )
+            raise HTTPException( status_code=400, detail="Request object not found"  ) #Si no se encuentra el objeto request, lanza una excepcion HTTP 400
 
         authorization: str = request.headers.get("Authorization")
         if not authorization:
-            raise HTTPException( status_code=400, detail="Authorization header missing"  )
+            raise HTTPException( status_code=400, detail="Authorization header missing"  ) #Si no se encuentra el encabezado de autorización, lanza una excepcion HTTP 400 
 
-        schema, token = authorization.split()
+        schema, token = authorization.split() # Descompone el encabezado de autorización
         if schema.lower() != "bearer":
-            raise HTTPException( status_code=400, detail="Invalid auth schema"  )
+            raise HTTPException( status_code=400, detail="Invalid auth schema"  ) # Si el esquema no es "Bearer", lanza una excepcion HTTP 400, bearer es el esquema de autorización utilizado para los tokens JWT
 
         try:
-            payload = jwt.decode( token , SECRET_KEY, algorithms=["HS256"] )
+            payload = jwt.decode( token , SECRET_KEY, algorithms=["HS256"] ) # Decodifica el token JWT usando la clave secreta y el algoritmo HS256
 
             email = payload.get("email")
             firstname = payload.get("firstname")
@@ -68,14 +69,15 @@ def validateuser(func):
             id = payload.get("id")
 
             if email is None:
-                raise HTTPException( status_code=401 , detail="Token Invalid" )
+                raise HTTPException( status_code=401 , detail="Token Invalid" ) # Si el email es None, lanza una excepcion HTTP 401
 
             if datetime.utcfromtimestamp(exp) < datetime.utcnow():
-                raise HTTPException( status_code=401 , detail="Expired token" )
+                raise HTTPException( status_code=401 , detail="Expired token" ) # Si el token ha expirado, lanza una excepcion HTTP 401
 
             if not active:
-                raise HTTPException( status_code=401 , detail="Inactive user" )
-
+                raise HTTPException( status_code=401 , detail="Inactive user" ) # Si el usuario no está activo, lanza una excepcion HTTP 401
+            
+            # Asigna los valores del payload al objeto request.state
             request.state.email = email
             request.state.firstname = firstname
             request.state.lastname = lastname

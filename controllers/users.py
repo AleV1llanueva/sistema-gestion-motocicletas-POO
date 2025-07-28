@@ -1,3 +1,4 @@
+from bson import ObjectId
 import os, logging, firebase_admin, requests
 
 from fastapi import HTTPException
@@ -61,8 +62,6 @@ async def login(user: Login) -> dict:
     response = requests.post(url, json=payload)
     response_data = response.json()
     
-    print("Firebase response:", response_data)  # <-- Agrega esta línea para depuración
-    
     if "error" in response_data:
         raise HTTPException(
             status_code=400,
@@ -89,3 +88,47 @@ async def login(user: Login) -> dict:
             str(user_info["_id"])
         )
     }
+    
+async def inactivate_user(user_id:str, user: User) -> User:
+    coll = get_collection("users")
+    result = coll.find_one({"_id": ObjectId(user_id)})
+    if not result:
+        raise HTTPException(
+            status_code=404,
+            detail="Usuario no encontrado"
+        )
+
+    # Actualiza el estado del usuario a inactivo
+    result = coll.update_one({"_id": ObjectId(user_id)}, {"$set": {"active": False}})
+    
+    if result.modified_count == 0:
+        raise HTTPException(
+            status_code=400,
+            detail="No se pudo actualizar el estado del usuario"
+        )
+
+    coll_empleado = get_collection("empleados")  # Obtiene la colección de empleados desde MongoDB
+    # Verifica si hay empleados asociados a este usuario
+    existing_empleado = coll_empleado.find_one({"id_usuario": user_id})
+    if existing_empleado:
+        #Si existe un empleado asociado a este usuario, lo inactiva
+        coll_empleado.update({"_id": existing_empleado["_id"]}, {"$set": {"activo": False}})
+        existing_empleado["activo"] = False
+        
+    user.id = user_id
+    user.active = False
+    return user
+
+async def get_user_by_id(user_id: str) -> User:
+    coll = get_collection("users")
+    user_data = coll.find_one({"_id": ObjectId(user_id)})
+    if not user_data:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    user_data["id"] = str(user_data["_id"])
+    user_data.pop("_id", None)
+    user_data["password"] = "*********"
+    return User(**user_data)
+
+#Pipelines
+#Hacer el get por id
+# get de todos que si es admin de todos y que si no solo de la informacion del usuario
