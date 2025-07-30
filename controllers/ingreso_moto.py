@@ -3,6 +3,7 @@ from models.ingreso_moto import IngresoMoto
 from fastapi import HTTPException
 from utils.mongodb import get_collection
 from bson import ObjectId
+from pipelines.ingreso_moto_pipeline import get_ingreso_moto_by_id_pipeline
 
 coll = get_collection("ingresos_motos")
 
@@ -27,18 +28,34 @@ async def create_ingreso_moto(ingreso: IngresoMoto) -> IngresoMoto:
 
     return ingreso
 
-async def get_ingreso_moto_by_id(ingreso_id: str) -> IngresoMoto:
+async def get_ingreso_moto_by_id(ingreso_id: str) -> dict:
     try:
-        if not ObjectId.is_valid(ingreso_id):
-            raise HTTPException(status_code=400, detail="ID inválido")
+        
+        pipeline = get_ingreso_moto_by_id_pipeline(ingreso_id)
+        result = list(coll.aggregate(pipeline))
+        
+        if not result :
+            raise HTTPException(status_code=404, detail="ingreso no encontrado")
+        
+        doc = result
+        
+        def convert_object_ids_recursive(obj):
+            if isinstance(obj, dict):
+                return {
+            k: convert_object_ids_recursive(v)
+            for k, v in obj.items()
+                }
+            elif isinstance(obj, list):
+                return [convert_object_ids_recursive(i) for i in obj]
+            elif isinstance(obj, ObjectId):
+                return str(obj)
+            else:
+                return obj
+        
+        doc = convert_object_ids_recursive(result[0])
 
-        ingreso = coll.find_one({"_id": ObjectId(ingreso_id)})
-        if not ingreso:
-            raise HTTPException(status_code=404, detail="Ingreso no encontrado")
-
-        ingreso["id"] = str(ingreso["_id"])
-        del ingreso["_id"]  # Eliminar el campo _id de MongoDB al momento de crear el objeto IngresoMoto
-        return IngresoMoto(**ingreso)
+        
+        return doc
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

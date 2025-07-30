@@ -17,6 +17,6 @@ class Modelo(BaseModel):
     )
     
     nombre: str = Field (
-        description="Nombre de la marca",
+        description="Nombre del modelo de motocicleta",
         examples=["250F", "450R"]
     )

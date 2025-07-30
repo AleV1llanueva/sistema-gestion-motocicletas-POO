@@ -89,7 +89,7 @@ async def login(user: Login) -> dict:
         )
     }
     
-async def inactivate_user(user_id:str, user: User) -> User:
+async def inactivate_user(user_id:str) -> User:
     coll = get_collection("users")
     result = coll.find_one({"_id": ObjectId(user_id)})
     if not result:
@@ -115,9 +115,7 @@ async def inactivate_user(user_id:str, user: User) -> User:
         coll_empleado.update({"_id": existing_empleado["_id"]}, {"$set": {"activo": False}})
         existing_empleado["activo"] = False
         
-    user.id = user_id
-    user.active = False
-    return user
+    return {"message" : "El usuario ha sido desactivado"}
 
 async def get_user_by_id(user_id: str) -> User:
     coll = get_collection("users")
@@ -126,9 +124,5 @@ async def get_user_by_id(user_id: str) -> User:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
     user_data["id"] = str(user_data["_id"])
     user_data.pop("_id", None)
-    user_data["password"] = "*********"
+    user_data["password"] = "P4ssw0rdN0t4llowed!"
     return User(**user_data)
-
-#Pipelines
-#Hacer el get por id
-# get de todos que si es admin de todos y que si no solo de la informacion del usuario

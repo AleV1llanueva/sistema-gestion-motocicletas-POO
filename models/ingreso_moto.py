@@ -27,10 +27,9 @@ class IngresoMoto(BaseModel):
         examples=["60c72b2f9b1e8d3f4c8b4569", "60c72b2f9b1e8d3f4c8b4570"]
     )
 
-    id_estado_actual: Optional[str] = Field(
-        default=None,
-        description="ID del estado de la motocicleta al momento del ingreso",
-        examples=["60c72b2f9b1e8d3f4c8b4571", "60c72b2f9b1e8d3f4c8b4572"]
+    estado: Optional[str] = Field(
+        description="Descripción del estado",
+        examples=["En espera", "En reparación", "Listo para entrega", "Entregado"]
     )
     
     fecha_ingreso: str = Field(
@@ -59,11 +58,6 @@ class IngresoMoto(BaseModel):
         description="Número de identificación del vehículo (VIN)",
         pattern=r"^[A-HJ-NPR-Z0-9]{17}$",
         examples=["1HGCM82633A123456", "1FTRX18W51NA12345"]
-    )
-    
-    year:int = Field(
-        description="Año al que pertence la motocicleta del ingreso",
-        examples=[2025, 2023, 2007]
     )
     
     es_dueno: bool = Field(
