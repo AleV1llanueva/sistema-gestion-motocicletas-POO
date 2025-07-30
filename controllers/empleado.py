@@ -11,7 +11,6 @@ coll = get_collection("empleados")
 
 async def create_empleado(empleado: Empleado) -> dict:
     try:
-        print("Esto se ejecuta")
         #Verificacion de que ningun otro empleado tenga al referencia al usuario
         existing_empleado = coll.find_one({"id_usuario":empleado.id_usuario})
         if existing_empleado:

@@ -3,17 +3,7 @@ from models.brand import Brand
 from controllers.brand import create_brand, get_brands, get_brand_by_id, update_brand, delete_brand
 from utils.security import validateadmin
 
-router = APIRouter() # Define un router para agrupar las rutas relacionadas con marcas
-
-#un router es una forma de agrupar rutas relacionadas en FastAPI, lo que permite organizar mejor el código y reutilizarlo en diferentes partes de la aplicación.
-
-#response_model es un parámetro que se utiliza para especificar el modelo de respuesta que se espera devolver en la respuesta de la API. Esto permite a FastAPI generar automáticamente la documentación de la API y validar las respuestas.
-#tags es un parámetro que se utiliza para agrupar las rutas en la documentación de la API. Esto permite organizar mejor la documentación y hacerla más legible.
-# Este archivo define las rutas relacionadas con las marcas de vehículos
-
-#el "-> Brand" indica que la función devuelve un objeto de tipo Brand, lo que permite a FastAPI generar automáticamente la documentación de la API y validar las respuestas.
-
-#await es una palabra clave en Python que se utiliza para esperar a que una función asíncrona se complete. En este caso, se utiliza para esperar a que las funciones de la capa de controladores (controllers) se completen antes de devolver la respuesta.
+router = APIRouter() 
 
 @router.post("/brands", response_model=Brand, tags=["Brands"])
 @validateadmin
