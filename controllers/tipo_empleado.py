@@ -24,8 +24,6 @@ async def get_tipo_empleados() -> list[TipoEmpleado]:
     try:
         tipo_empleados = []
         for tipo_empleado in coll.find(): #Busca todos los tipos de empleados en la colección
-            # Convierte el ObjectId de MongoDB a string y elimina el campo _id
-            # coll.find() devuelve un cursor, que es un iterable de documentos
             tipo_empleado["id"] = str(tipo_empleado["_id"])
             del tipo_empleado["_id"] # Eliminar el campo _id de MongoDB al momento de crear el objeto TipoEmpleado
             tipo_empleados.append(TipoEmpleado(**tipo_empleado))

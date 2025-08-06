@@ -1,0 +1,17 @@
+name: Deploy to Railway #nombre
+
+on: #desencadenaores
+    push:
+        branches: [main] #branches o hilos que se activan al hacer un push
+
+jobs:
+    helloworld:
+        runs-on: ubuntu-latest #Servidor que queremos utilizar como Runner o Agente para la preconfiguracion de release
+        
+        steps : #Hacemos la configuracion (lineas de comandos de terminal)
+        - uses : actions/checkout@v4 #Ayuda a hacer checkouts del codigo para poder empezar a trabajar (imprimir en consola algo)
+        
+        - name: Imprimir en consola #identicar el siguiente paso
+          run: #Aqui ponemos todas las instrucciones que se harian en consola, pero las ponermos aqui, ejemplo (echo "Hello World")
+             echo "Hello World, GitHub Action" 
+

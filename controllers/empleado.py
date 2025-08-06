@@ -27,10 +27,6 @@ async def create_empleado(empleado: Empleado) -> dict:
         if not existing_user:
             raise HTTPException(status_code=404, detail="El usuario de referencia no existe o no esta activo ")
 
-        # existing_user = coll_users.find_one({"_id": ObjectId(empleado.id_usuario)})
-        
-        # if not existing_user:
-        #     raise HTTPException(status_code=404, detail="Usuario no encontrado, no podemos registrar el empleado")
         
         #Verificar que existe el tipo de emppleado
         coll_tipos_empleados = get_collection("tipos_empleado")
