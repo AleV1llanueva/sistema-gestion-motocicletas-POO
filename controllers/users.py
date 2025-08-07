@@ -1,3 +1,5 @@
+import base64
+import json
 from bson import ObjectId
 import os, logging, firebase_admin, requests
 
@@ -13,8 +15,31 @@ from utils.mongodb import get_collection
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-cred = credentials.Certificate("secrets/motocicleta-secret.json")
-firebase_admin.initialize_app(cred)
+
+def initialize_firebase() :
+    if firebase_admin._apps:
+        return
+    
+    try:
+        firebase_creds_base64 = os.getenv("FIREBASE_CREDENTIALS_BASE64")
+        
+        if firebase_creds_base64: #Si existe la credencial
+            firebase_creds_json = base64.b64decode(firebase_creds_base64).decode('utf-8') #Decofidificamos
+            firebase_creds = json.loads(firebase_creds_json) #cargar json
+            cred = credentials.Certificate(firebase_creds) #creamos las credenciales
+            firebase_admin.initialize_app(cred)
+            logger.info("Firebase initialized with environment variable credentials")
+            
+        else:
+            # Fallback to local file (for local development)
+            cred = credentials.Certificate("secrets/motocicleta-secret.json")
+            firebase_admin.initialize_app(cred)
+            logger.info("Firebase initialized with JSON file")
+            
+    except Exception as e:
+        logger.error(f"Failes to initialized firebase: {e}")
+        
+initialize_firebase()
 
 async def create_user(user: User) -> User:
     user_record = {}

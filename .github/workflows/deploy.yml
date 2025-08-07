@@ -15,3 +15,42 @@ jobs:
           run: #Aqui ponemos todas las instrucciones que se harian en consola, pero las ponermos aqui, ejemplo (echo "Hello World")
              echo "Hello World, GitHub Action" 
 
+    test:
+        needs: helloworld #Se necesita que termine helloworld para que continue
+        runs-on: ubuntu-latest
+        steps:
+          - uses : actions/checkout@v4
+
+          - name : Set up python 3.13.2
+            uses : actions/setup-python@v4 #Action de GitHUb que ayuda a configurar el lenguaje (python) sobre el agente
+            with :
+                python-version: '3.13' #La version de python la que se utilizará
+
+          - name : Install Librearies
+            run: | # "|" Ayuda a empezar a dar enters de lo que yo quiero correr, instalamos las librerias necesarias guardadas en requirements, hay que setear las variables de ambiente
+                    python -m pip install --upgrade pip
+                    pip install -r requirements.txt
+
+
+            #Importamos las variables de ambiente {.env}
+          - name: Test FastAPI imports
+            env:
+                MONGODB_URI: ${{ secrets.MONGODB_URI }}
+                DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
+                FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
+                SECRET_KEY: ${{ secrets.SECRET_KEY }}
+                RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+                FIREBASE_CREDENTIALS_BASE64: ${{ secrets.FIREBASE_CREDENTIALS_BASE64 }}
+            run: |
+                python -c "from main import app; print("FASTAPI app imported successfully")"
+
+          - name: Run tests
+            env:
+                MONGODB_URI: ${{ secrets.MONGODB_URI }}
+                DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
+                FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
+                SECRET_KEY: ${{ secrets.SECRET_KEY }}
+                RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+                FIREBASE_CREDENTIALS_BASE64: ${{ secrets.FIREBASE_CREDENTIALS_BASE64 }}
+            run: |
+                pytest --fixtures test_database.py

@@ -48,6 +48,32 @@ app.include_router(employee_types_router) # Incluye el router de tipos de emplea
 def read_root():
     return {"Hello": "World"}
 
+#Al hacer el release de nuestra aplicacion
+@app.get("/health") #Para ver la salud de la api en nuestro servidor, normalmente se utiliza en restful api, es un endpoint para el servidor que correra nuestro aplicacion, para ver como esta nuestro apli
+def health_check() :
+    try:
+        return {
+            "status" : "healthy",
+            "timestamp" : "2025-08-06",
+            "service" : "taller-motoicletas-api",
+            "environment" : "production"
+        }
+    except Exception as e:
+        return {"status" : "unhealthy", "error" : str(e)}
+
+@app.get("/ready") #Para testear la conexion con mongodb (para pruebas unitarias)
+def readiness_check() :
+    try:
+        from utils.mongodb import test_connection
+        db_status = test_connection()
+        return {
+            "status" : "ready" if db_status else "not_ready",
+            "database" : "connected" if db_status else "disconnected",
+            "service" : "taller-motocicletas-api"
+        }
+    except Exception as e:
+        return {"status" : "not_ready", "error" : str(e)}
+
 
 
 #decorador es una funcion que recibe otra funcion como parametro, y devuelve una nueva funcion que envuelve la original
