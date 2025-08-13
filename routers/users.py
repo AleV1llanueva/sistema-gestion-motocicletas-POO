@@ -8,7 +8,7 @@ from utils.security import validateuser, validateadmin
 
 router = APIRouter()
 
-@router.post("/signup")
+@router.post("/users")
 async def create_user_endpoint(user: User) -> User:
     return await create_user(user)
 
