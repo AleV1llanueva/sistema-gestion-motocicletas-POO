@@ -17,3 +17,8 @@ class Motorcycle(BaseModel):
         pattern=r"^[0-9A-Za-zÁÉÍÓÚÑáéíóúñ' -]+$", #Validación de caracteres permitidos (letras, números, espacios, guiones y acentos
         examples=["YZ", "WR", "CBR", "Ninja", "XTZ"] # Ejemplos de nombres válidos
     )
+    
+    active: bool = Field(
+        default=True,
+        description="Estado activo de la motocicleta"
+    )

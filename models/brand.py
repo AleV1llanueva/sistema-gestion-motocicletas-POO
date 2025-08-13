@@ -13,3 +13,8 @@ class Brand(BaseModel):
         pattern=r"^[0-9A-Za-zÁÉÍÓÚÑáéíóúñ' -]+$", #Validación de caracteres permitidos (letras, números, espacios, guiones y acentos
         examples=["Yamaha", "Honda", "Suzuki", "Kawasaki", "BMW", "Ducati", "Harley-Davidson", "Triumph", "KTM", "Aprilia"]
     )
+    
+    active: bool = Field (
+        default=True,
+        description="Estado activo de la marca"
+    )
