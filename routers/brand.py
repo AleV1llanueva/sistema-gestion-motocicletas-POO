@@ -6,7 +6,7 @@ from utils.security import validateadmin, validateuser
 router = APIRouter() 
 
 @router.post("/brands", response_model=Brand, tags=["Brands"])
-@validateadmin
+@validateuser
 async def create_brand_endpoint(request: Request, brand: Brand) -> Brand:
     return await create_brand(brand)
 
@@ -21,11 +21,11 @@ async def get_brand_by_id_endpoint(request: Request, brand_id: str) -> Brand:
     return await get_brand_by_id(brand_id)
 
 @router.put("/brands/{brand_id}", response_model=Brand, tags=["Brands"]) # Actualiza una marca por su ID
-@validateadmin
+@validateuser
 async def update_brand_endpoint(request: Request, brand_id: str, brand: Brand) -> Brand:
     return await update_brand(brand_id, brand)
 
 @router.delete("/brands/{brand_id}", tags=["Brands"]) # Elimina una marca por su ID
-@validateadmin
+@validateuser
 async def delete_brand_endpoint(request: Request, brand_id: str) -> None:
     return await desactivate_brand(brand_id)
