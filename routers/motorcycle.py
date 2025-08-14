@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Request
 from models.motorcycle import Motorcycle
 from controllers.motorcycle import create_motorcycle, get_motorcycles, get_motorcycle_by_id, update_motorcycle, delete_motorcycle
-from utils.security import validateadmin
+from utils.security import validateadmin, validateuser
 
 router = APIRouter() # Define un router para agrupar las rutas relacionadas con motocicletas
 
@@ -11,11 +11,13 @@ async def create_motorcycle_endpoint(request: Request, motorcycle: Motorcycle) -
     return await create_motorcycle(motorcycle)
 
 @router.get("/motorcycles", response_model=dict, tags=["Motorcycles"]) # Obtiene todas las motocicletas
+@validateuser
 async def get_motorcycles_endpoint() -> dict:
     motorcycles = await get_motorcycles()
     return {"motorcycles": motorcycles}
 
 @router.get("/motorcycles/{motorcycle_id}", response_model=Motorcycle, tags=["Motorcycles"]) # Obtiene una motocicleta por su ID
+@validateuser
 async def get_motorcycle_by_id_endpoint(request: Request, motorcycle_id: str) -> Motorcycle:
     return await get_motorcycle_by_id(motorcycle_id)
 

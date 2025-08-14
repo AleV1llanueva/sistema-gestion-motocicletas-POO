@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Request
 from models.brand import Brand
 from controllers.brand import create_brand, get_brands, get_brand_by_id, update_brand, delete_brand, desactivate_brand
-from utils.security import validateadmin
+from utils.security import validateadmin, validateuser
 
 router = APIRouter() 
 
@@ -11,10 +11,12 @@ async def create_brand_endpoint(request: Request, brand: Brand) -> Brand:
     return await create_brand(brand)
 
 @router.get("/brands", response_model=list, tags=["Brands"]) # Obtiene todas las marcas
+@validateuser
 async def get_brands_endpoint(request: Request, ) -> list:
     return await get_brands()
 
 @router.get("/brands/{brand_id}", response_model=Brand, tags=["Brands"]) # Obtiene una marca por su ID
+@validateuser
 async def get_brand_by_id_endpoint(request: Request, brand_id: str) -> Brand:
     return await get_brand_by_id(brand_id)
 
