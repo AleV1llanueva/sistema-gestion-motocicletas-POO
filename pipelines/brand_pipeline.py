@@ -43,7 +43,7 @@ def validate_brand_is_assigned(id:str) -> list:
     return [
         {
             "$match" : {
-                "$_id" : ObjectId(id)
+                "_id" : ObjectId(id)
             }  
         },{
             '$addFields': {
