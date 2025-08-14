@@ -3,6 +3,8 @@ from utils.mongodb import get_collection
 from fastapi import HTTPException
 from bson import ObjectId
 
+from pipelines.brand_pipeline import get_brand_pipeline, validate_brand_is_assigned
+
 coll = get_collection("brands")
 
 async def create_brand(brand: Brand) -> Brand:
@@ -22,14 +24,17 @@ async def create_brand(brand: Brand) -> Brand:
     
 async def get_brands() -> list[Brand]:
     try:
-        brands = []
-        for brand in coll.find():
-            brand["id"] = str(brand["_id"])
-            del brand["_id"] # Eliminar el campo _id de MongoDB al momento de crear el objeto Brand
-            brands.append(Brand(**brand))
+        pipeline = get_brand_pipeline()
+        brands = list(coll.aggregate(pipeline))
+        
+        # brands = []
+        # for brand in coll.find():
+        #     brand["id"] = str(brand["_id"])
+        #     del brand["_id"] # Eliminar el campo _id de MongoDB al momento de crear el objeto Brand
+        #     brands.append(Brand(**brand))
         return brands
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=f"Error fetching brand: {str(e)}")
     
 async def get_brand_by_id(brand_id: str) -> Brand:
     try:
@@ -65,6 +70,28 @@ async def update_brand(brand_id: str, brand: Brand) -> Brand:
         return brand
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+    
+async def desactivate_brand(brand_id : str) -> dict:
+    try :
+        pipeline = validate_brand_is_assigned(brand_id)
+        assigned = list(coll.aggregate(pipeline))
+        
+        if assigned is None:
+            raise HTTPException(status_code=404, detail="Brand not found")
+        
+        if assigned[0]["number_of_motos"] > 0:
+            coll.update_one(
+                {"_id" : ObjectId(brand_id)},
+                {"$set" : {"active" : False}}
+            )
+            return {"message" : "Brand is assigned to motorcycles and has been desactivate"}
+        else:
+            coll.delete_one({"_id" : ObjectId(brand_id)})
+            return {"message" : "Brand deleted sucefully"}
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error desactivating catalog type: {str(e)} ")
 
 
 async def delete_brand(brand_id: str) -> Brand: # Eliminar una marca por su ID

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Request
 from models.brand import Brand
-from controllers.brand import create_brand, get_brands, get_brand_by_id, update_brand, delete_brand
+from controllers.brand import create_brand, get_brands, get_brand_by_id, update_brand, delete_brand, desactivate_brand
 from utils.security import validateadmin
 
 router = APIRouter() 
@@ -26,4 +26,4 @@ async def update_brand_endpoint(request: Request, brand_id: str, brand: Brand) -
 @router.delete("/brands/{brand_id}", tags=["Brands"]) # Elimina una marca por su ID
 @validateadmin
 async def delete_brand_endpoint(request: Request, brand_id: str) -> None:
-    return await delete_brand(brand_id)
+    return await desactivate_brand(brand_id)
