@@ -34,7 +34,7 @@ def get_brand_pipeline() -> list:
                 'id': '$_id.id', 
                 'description': '$_id.description', 
                 'active': '$_id.active', 
-                'number_of_motos': 1
+                'number_of_motos': '$number_of_motos'
             }
         }
     ]

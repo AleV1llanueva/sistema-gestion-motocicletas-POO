@@ -22,7 +22,7 @@ async def create_brand(brand: Brand) -> Brand:
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
-async def get_brands() -> list[Brand]:
+async def get_brands() -> list:
     try:
         pipeline = get_brand_pipeline()
         brands = list(coll.aggregate(pipeline))

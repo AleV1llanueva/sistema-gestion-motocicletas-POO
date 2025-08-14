@@ -10,8 +10,8 @@ router = APIRouter()
 async def create_brand_endpoint(request: Request, brand: Brand) -> Brand:
     return await create_brand(brand)
 
-@router.get("/brands", response_model=list[Brand], tags=["Brands"]) # Obtiene todas las marcas
-async def get_brands_endpoint(request: Request, ) -> list[Brand]:
+@router.get("/brands", response_model=list, tags=["Brands"]) # Obtiene todas las marcas
+async def get_brands_endpoint(request: Request, ) -> list:
     return await get_brands()
 
 @router.get("/brands/{brand_id}", response_model=Brand, tags=["Brands"]) # Obtiene una marca por su ID
