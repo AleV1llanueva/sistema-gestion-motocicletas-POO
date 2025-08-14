@@ -12,7 +12,7 @@ async def create_motorcycle_endpoint(request: Request, motorcycle: Motorcycle) -
 
 @router.get("/motorcycles", response_model=dict, tags=["Motorcycles"]) # Obtiene todas las motocicletas
 @validateuser
-async def get_motorcycles_endpoint() -> dict:
+async def get_motorcycles_endpoint(request: Request,) -> dict:
     motorcycles = await get_motorcycles()
     return {"motorcycles": motorcycles}
 
