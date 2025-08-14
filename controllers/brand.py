@@ -91,7 +91,7 @@ async def desactivate_brand(brand_id : str) -> dict:
             return {"message" : "Brand deleted sucefully"}
         
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error desactivating catalog type: {str(e)} ")
+        raise HTTPException(status_code=500, detail=f"Error desactivating brand: {str(e)} ")
 
 
 async def delete_brand(brand_id: str) -> Brand: # Eliminar una marca por su ID
