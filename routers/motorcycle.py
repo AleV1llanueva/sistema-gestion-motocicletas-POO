@@ -6,7 +6,7 @@ from utils.security import validateadmin, validateuser
 router = APIRouter() # Define un router para agrupar las rutas relacionadas con motocicletas
 
 @router.post("/motorcycles", response_model=Motorcycle, tags=["Motorcycles"])
-@validateadmin
+@validateuser
 async def create_motorcycle_endpoint(request: Request, motorcycle: Motorcycle) -> Motorcycle:
     return await create_motorcycle(motorcycle)
 
@@ -22,11 +22,11 @@ async def get_motorcycle_by_id_endpoint(request: Request, motorcycle_id: str) ->
     return await get_motorcycle_by_id(motorcycle_id)
 
 @router.put("/motorcycles/{motorcycle_id}", response_model=Motorcycle, tags=["Motorcycles"]) # Actualiza una motocicleta por su ID
-@validateadmin
+@validateuser
 async def update_motorcycle_endpoint(request: Request, motorcycle_id: str, motorcycle: Motorcycle) -> Motorcycle:
     return await update_motorcycle(motorcycle_id, motorcycle)
 
 @router.delete("/motorcycles/{motorcycle_id}", tags=["Motorcycles"]) # Elimina una motocicleta por su ID
-@validateadmin
+@validateuser
 async def delete_motorcycle_endpoint(request: Request, motorcycle_id: str) -> None:
     return await delete_motorcycle(motorcycle_id)
