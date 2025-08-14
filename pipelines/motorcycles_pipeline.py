@@ -20,5 +20,6 @@ def get_motorcycles_with_brand_pipeline() -> list:
             "id_marca": "$id_marca",  # Incluye el id de la marca
             "name": "$name",
             "brand_name": "$marca.description",
+            "active" : "$active"
         }}
     ]
